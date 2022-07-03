@@ -1,32 +1,31 @@
 ---
-name: CI
+name: Lint/Scan
 
 on:
-  # Run tests for any PRs.
   pull_request:
 
 jobs:
   lint:
-    name: Lint Code Base
+    name: lint
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Lint Code Base
+      - name: lint code
         uses: github/super-linter@v4.9.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_GITHUB_ACTIONS: false
 
-  Anchore-Build-Scan:
+  scan:
     needs: lint
-    name: Anchore-Build-Scan
+    name: scan dockerfile
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Build container image
+      - name: build container image
         run: docker build . --file .devcontainer/Dockerfile --tag localbuild/testimage:latest
 
       - name: run local anchore scan
