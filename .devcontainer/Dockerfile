@@ -1,10 +1,20 @@
-FROM elixir:1.13.0
+FROM elixir:1.13.4-otp-25
 
-LABEL org.opencontainers.image.description="Elixir devcontainer for VSCode or Codespaces"
-LABEL org.opencontainers.image.source=https://github.com/hspaans/elixir-devcontainer
+LABEL org.opencontainers.image.description="A dev container configuration for elixir development"
+LABEL org.opencontainers.image.source=https://github.com/unwetter-cloud/devcontainer-elixir
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Configure apt and install packages
+# hadolint ignore=DL3008
+RUN apt-get update \
+    && apt-get -y install --no-install-recommends \
+        git procps iproute2 lsb-release ca-certificates sudo \
+    # Clean up
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # This Dockerfile adds a non-root user with sudo access. Use the "remoteUser"
 # property in devcontainer.json to use it. On Linux, the container user's GID/UIDs
@@ -14,28 +24,11 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# Configure apt and install packages
-# hadolint ignore=DL3008
-RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
-    #
-     # Install bash tree
-    && apt-get -y install --no-install-recommends tree \
-    # Install git iproute2, procps, lsb-release (useful for CLI installs)
-    && apt-get -y install --no-install-recommends git iproute2 procps iproute2 lsb-release ca-certificates \
-    #
-    # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
-    && groupadd --gid $USER_GID $USERNAME \
+# Create non-root user with sudo privileges
+RUN groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    # [Optional] Add sudo support for the non-root user
-    # && apt-get install -y sudo \
-    # && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
-    # && chmod 0440 /etc/sudoers.d/$USERNAME \
-    #
-    # Clean up
-    && apt-get autoremove -y \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog

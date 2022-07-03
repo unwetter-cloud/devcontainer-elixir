@@ -19,6 +19,7 @@
     "editorconfig.editorconfig",
     "github.vscode-pull-request-github",
     "jakebecker.elixir-ls",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "vscodevim.vim"
   ]
 }
