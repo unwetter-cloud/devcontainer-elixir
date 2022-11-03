@@ -1,4 +1,4 @@
-FROM elixir:1.13.4-otp-25
+FROM elixir:1.14.1-slim
 
 LABEL org.opencontainers.image.description="A dev container configuration for elixir development"
 LABEL org.opencontainers.image.source=https://github.com/unwetter-cloud/devcontainer-elixir
